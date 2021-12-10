@@ -1,8 +1,10 @@
+from copy import deepcopy
+from PIL import Image
+
 import pandas as pd
 import cv2
 import numpy as np
-from PIL import Image
-from copy import deepcopy
+
 
 def draw_head_pose(
     vector: dict, image: np.ndarray, color=(255, 255, 255), linewidth: float = 2

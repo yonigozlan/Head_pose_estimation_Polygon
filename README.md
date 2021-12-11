@@ -1,9 +1,9 @@
 # Head_pose_estimation_Polygon
-In this repository, you will find the code I used to do the who's who exercise along with the two SOTA implementation I used to get head pose estimations on the given samples.
+In this repository, you will find the code I used to do the who's who exercise along with the three SOTA implementations I used to get head pose estimations on the given samples.
 
 ## Setup
-The two SOTA implementations don't use the same version of python. I advise to use different virtual environments for each of them.
-WHENet uses python 3.6.13, and 3DDFA_V2 python 3.8.0.
+The three SOTA implementations don't use the same version of python. I advise to use different virtual environments for each of them.
+WHENet and SADRNet use python 3.6.13, and 3DDFA_V2 python 3.8.0.
 Each implementation has its own requirements.txt to install.
 
 ### WHENet
@@ -17,8 +17,15 @@ place yourself in the 3DDFA_V2 folder and run:
 sh ./build.sh
 ```
 
+### SADRNet
+This implementation uses Cpython and must therefore be built before being used.
+place yourself in SADRNet-main\src\faceutil\mesh\cython and run:
+```
+python setup.py build_ext --inplace 
+```
+
 ## Usage
-To test an implementation on a video file, place yourself in the folder of the implementation you want to test (WHENet or 3DDFA_V2), and run:
+To test an implementation on a video file, place yourself in the folder of the implementation you want to test (WHENet, 3DDFA_V2 or SADRNet-main), and run:
 ```
 python main_"implementation".py --video "path_to_video_file" --output "path_to_output_file"
 ```

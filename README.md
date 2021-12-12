@@ -12,14 +12,16 @@ https://drive.google.com/file/d/1wGrwu_5etcpuu_sLIXl9Nu0dwNc8YXIH/view?usp=shari
 
 ### 3DDFA_V2
 This implementation uses Cpython and must therefore be built before being used.
-place yourself in the 3DDFA_V2 folder and run:
+Place yourself in the 3DDFA_V2 folder and run:
 ```
 sh ./build.sh
 ```
 
 ### SADRNet
+In order to use SADRNet, you must download YOLOv3 model for head detection and put it under SADRNet-main/src/yolo_v3/data using this link:
+https://drive.google.com/file/d/1wGrwu_5etcpuu_sLIXl9Nu0dwNc8YXIH/view?usp=sharing.
 This implementation uses Cpython and must therefore be built before being used.
-place yourself in SADRNet-main\src\faceutil\mesh\cython and run:
+Place yourself in SADRNet-main\src\faceutil\mesh\cython and run:
 ```
 python setup.py build_ext --inplace 
 ```

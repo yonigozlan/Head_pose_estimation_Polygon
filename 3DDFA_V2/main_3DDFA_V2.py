@@ -45,26 +45,29 @@ def main(args):
 
     # run
     dense_flag = args.opt in ('3d',)
-    pre_ver = None
     for i, frame in tqdm(enumerate(reader)):
         frame_bgr = frame[..., ::-1]  # RGB->BGR
-
+        # refinement needed for the first frame
         if i == 0:
+            # detect all faces
             boxes = face_boxes(frame_bgr)
+            # get 3DMM params for each face
             param_lst, roi_box_lst = tddfa(frame_bgr, boxes)
+            # convert the 3DMM params to 3D vertices (facial landmarks)
             ver = tddfa.recon_vers(param_lst, roi_box_lst, dense_flag=dense_flag)
 
             # refine
             param_lst, roi_box_lst = tddfa(frame_bgr, ver, crop_policy='landmark')
             ver = tddfa.recon_vers(param_lst, roi_box_lst, dense_flag=dense_flag)
         else:
+            # detect all faces
             boxes = face_boxes(frame_bgr)
+            # get 3DMM params for each face
             param_lst, roi_box_lst = tddfa(frame_bgr, boxes)
-
+            # convert the 3DMM params to 3D vertices (facial landmarks)
             ver = tddfa.recon_vers(param_lst, roi_box_lst, dense_flag=dense_flag)
 
-        pre_ver = ver  # for tracking
-
+        # multiple possibilities for vizualisation
         if args.opt == '2d_sparse':
             res = cv_draw_landmark(frame_bgr, ver)
         elif args.opt == '3d':
@@ -73,7 +76,7 @@ def main(args):
             res = viz_pose(np.array(frame_bgr), param_lst, ver)
         else:
             raise ValueError(f'Unknown opt {args.opt}')
-
+        # save frame into output video file
         writer.append_data(res[..., ::-1])  # BGR->RGB
 
     writer.close()

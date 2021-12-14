@@ -115,8 +115,8 @@ if __name__ == "__main__":
     ret, frame = cap.read()
     fourcc = cv2.VideoWriter_fourcc(*'MJPG')
     out = cv2.VideoWriter(VIDEO_OUTPUT, fourcc, 30.0, (frame.shape[1], frame.shape[0]))  # write the result to a video
-    # "299" shouldn't be hardcoded but I couldn't get the number of frame in a video, and the 3 samples are of the same length
-    for frame_nb in range(299):
+    length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))-1
+    for frame_nb in range(length):
         print(frame_nb)
         vector_dict = series.iloc[frame_nb].to_dict()
         ret, frame = cap.read()

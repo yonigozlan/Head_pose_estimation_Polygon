@@ -11,7 +11,6 @@ from src.yolo_v3.yolo_postprocess import YOLO
 from src.run.predict import SADRNv2Predictor, Evaluator
 
 def process_detection(predictor, evaluator, img, bbox , args ):
-
     y_min, x_min, y_max, x_max = bbox
     # enlarge the bbox to make it squared
     y_min, x_min, y_max, x_max = int(y_min), int(x_min), int(y_max), int(x_max)
@@ -28,38 +27,45 @@ def process_detection(predictor, evaluator, img, bbox , args ):
         else :
             y_max = y_max_temp
 
+    # retrive the cropped face
     img_rgb = img[int(y_min):int(y_max), int(x_min):int(x_max)]
+    # resize to fit the input size of the model
     img_rgb = cv2.resize(img_rgb, (256, 256))
-    
+    # evaluate head pose with SADRNet model and retrieve the annotated face
     img_cropped = evaluator.evaluate_example_one_image(predictor, init_img=img_rgb, is_visualize=False)
+    #resize to original size
     img_cropped = cv2.resize(img_cropped, (int(x_max-x_min), int(y_max-y_min)))
-    
+    # cropped out face with annotated one
     img[y_min:y_max, x_min:x_max]= img_cropped
     return img
 
 
 def main(args):
+    # load YOLO object for face detection
     yolo = YOLO(**vars(args))
-    VIDEO_SRC = 0 if args.video == '' else args.video # if video clip is passed, use web cam
+    # setup the parameters to open, analyze the initial video, and save the modified video.
+    VIDEO_SRC = args.video 
     cap = cv2.VideoCapture(VIDEO_SRC)
-    print('cap info',VIDEO_SRC)
     ret, frame = cap.read()
     fourcc = cv2.VideoWriter_fourcc(*'MJPG')
     out = cv2.VideoWriter(args.output, fourcc, 30, (frame.shape[1], frame.shape[0]))  # write the result to a video
+    # create needed object for SADRNet head pose estimation
     predictor_1 = SADRNv2Predictor(config.PRETAINED_MODEL)
     evaluator = Evaluator()
-
-    while True:
-        try:
-            ret, frame = cap.read()
-        except:
-            break
+    length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))-1
+    for frame_nb in range(length):
+        print(frame_nb)
+        ret, frame = cap.read()
         frame_rgb = frame
         img_pil = Image.fromarray(frame_rgb)
+        # detect faces in the frame
         bboxes, scores, classes = yolo.detect(img_pil)
         for bbox in bboxes:
+            # apply the head pose detection algorithm on a detected face (the vizualisation is written in place)
             frame = process_detection(predictor_1, evaluator,frame, bbox, args)
+        # preview of the modified frame
         cv2.imshow('output', frame)
+        # write annotated frame to video
         out.write(frame)
         key = cv2.waitKey(1) & 0xFF
         if key == ord("q"):
